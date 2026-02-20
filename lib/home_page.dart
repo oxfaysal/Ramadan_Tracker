@@ -163,15 +163,18 @@ class HomePage extends StatelessWidget {
 
                   SizedBox(height: 10),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-                    child: Text(
-                      "Get Started",
-                      style: APP_TEXT_STYLE.textPerpal12,
+                  InkWell(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TasbihPage())),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFFFFFFF),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                      child: Text(
+                        "Get Started",
+                        style: APP_TEXT_STYLE.textPerpal12,
+                      ),
                     ),
                   ),
                 ],
