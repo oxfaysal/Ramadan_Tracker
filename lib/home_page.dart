@@ -1,8 +1,8 @@
 import 'package:daily_ramadan_tracker_app/conts/TEXT_STYLE.dart';
+import 'package:daily_ramadan_tracker_app/tasbih_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,12 +100,14 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
-
           Container(
             height: 140,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              image: DecorationImage(image: AssetImage("assets/images/category_bg.png"), opacity: 0.2, fit: BoxFit.cover,
+              image: DecorationImage(
+                image: AssetImage("assets/images/category_bg.png"),
+                opacity: 0.2,
+                fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   Color(0xFFe6ddf9).withOpacity(0.9),
                   BlendMode.darken,
@@ -115,20 +117,19 @@ class HomePage extends StatelessWidget {
             padding: EdgeInsets.all(12),
             child: Column(
               children: [
-                Text("Category", style: APP_TEXT_STYLE.textBlack16,),
-                SizedBox(height: 12,),
+                Text("Category", style: APP_TEXT_STYLE.textBlack16),
+                SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _categoryCard("assets/images/prayer_time.png", "Prayer Time"),
-                    _categoryCard("assets/images/tasbih.png", "Tasbih"),
+                    _categoryCard("assets/images/prayer_time.png", "Prayer Time",),
+                    InkWell(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TasbihPage())),
+                        child: _categoryCard("assets/images/tasbih.png", "Tasbih",)),
                     _categoryCard("assets/images/dua.png", "Dua"),
                     _categoryCard("assets/images/quran.png", "Quran"),
                   ],
-                )
-
-
-
+                ),
               ],
             ),
           ),
@@ -144,14 +145,19 @@ class HomePage extends StatelessWidget {
                   image: AssetImage("assets/images/tasbih_count.png"),
                   fit: BoxFit.cover,
                   opacity: 0.5,
-                  colorFilter: ColorFilter.mode(Color(0xFF9373b6).withOpacity(1), BlendMode.darken)
+                  colorFilter: ColorFilter.mode(
+                    Color(0xFF9373b6).withOpacity(1),
+                    BlendMode.darken,
+                  ),
                 ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Start Your Day To Count", style: APP_TEXT_STYLE.textWhite16),
-
+                  Text(
+                    "Start Your Day To Count",
+                    style: APP_TEXT_STYLE.textWhite16,
+                  ),
 
                   Text("Tasbih", style: APP_TEXT_STYLE.textWhite16),
 
@@ -162,10 +168,7 @@ class HomePage extends StatelessWidget {
                       color: Color(0xFFFFFFFF),
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 20,
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                     child: Text(
                       "Get Started",
                       style: APP_TEXT_STYLE.textPerpal12,
@@ -184,42 +187,101 @@ class HomePage extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(15)),
                 image: DecorationImage(
-                    image: AssetImage("assets/images/prayer_sec.png"),
-                    fit: BoxFit.cover,
-                    opacity: 0.25,
-                    colorFilter: ColorFilter.mode(Color(0xFF764CA5).withOpacity(0.85), BlendMode.darken)
+                  image: AssetImage("assets/images/prayer_sec.png"),
+                  fit: BoxFit.cover,
+                  opacity: 0.25,
+                  colorFilter: ColorFilter.mode(
+                    Color(0xFF764CA5).withOpacity(0.85),
+                    BlendMode.darken,
+                  ),
                 ),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Prayer Time", style: APP_TEXT_STYLE.textWhite16),
+                  Center(
+                    child: Text(
+                      "Prayer Time",
+                      style: APP_TEXT_STYLE.textWhite16,
+                    ),
+                  ),
 
-
-                  Text("12 Mar 2024", style: APP_TEXT_STYLE.textWhite10),
+                  Center(
+                    child: Text(
+                      "12 Mar 2024",
+                      style: APP_TEXT_STYLE.textWhite10,
+                    ),
+                  ),
 
                   SizedBox(height: 10),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 20,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 30,
+                          decoration: BoxDecoration(color: Color(0xFFFFFFFF)),
+                          child: Center(
+                            child: Text(
+                              "Today",
+                              style: APP_TEXT_STYLE.textPerpal12,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      Expanded(
+                        child: Container(
+                          height: 30,
+                          decoration: BoxDecoration(color: Colors.transparent),
+                          child: Center(
+                            child: Text(
+                              "30Days",
+                              style: APP_TEXT_STYLE.textWhite12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  Divider(height: 1, color: Color(0xFFFFFFFF)),
+
+                  SizedBox(height: 10),
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
                     child: Text(
-                      "Get Started",
-                      style: APP_TEXT_STYLE.textPerpal12,
+                      "Next prayer: Asr in 2 hours, 17 minutes",
+                      style: APP_TEXT_STYLE.textGray10,
                     ),
+                  ),
+
+                  SizedBox(height: 5),
+
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Text("4:26 PM", style: APP_TEXT_STYLE.textWhite14),
+                  ),
+
+                  SizedBox(height: 10),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    spacing: 5,
+                    children: [
+                      _prayerCard("Fajr", "4:56AM"),
+                      _prayerCard("Dhuhr", "12:09PM"),
+                      _prayerCard("Asr", "4:26PM"),
+                      _prayerCard("Maghrib", "6:06PM"),
+                      _prayerCard("Isha", "7:21PM"),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
-
-
         ],
       ),
 
@@ -259,25 +321,38 @@ class HomePage extends StatelessWidget {
     );
   }
 
-   Widget _categoryCard(String img, String text) {
-     return Container(
-         height: 75,
-         width: 85,
-         padding: EdgeInsets.all(8),
-         decoration: BoxDecoration(
-           color: Color(0xFFFFFFFF),
-           borderRadius: BorderRadius.circular(5),
-         ),
-         child: Column(
-             children: [
-               Image.asset(img),
-               SizedBox(height: 8,),
-               Text(text, style: APP_TEXT_STYLE.textBlack10,),
-             ]
-         )
-     );
-   }
+  Widget _categoryCard(String img, String text) {
+    return Container(
+      height: 75,
+      width: 85,
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Color(0xFFFFFFFF),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        children: [
+          Image.asset(img),
+          SizedBox(height: 8),
+          Text(text, style: APP_TEXT_STYLE.textBlack10),
+        ],
+      ),
+    );
+  }
 
-
-
+  Widget _prayerCard(String title, String subTitle) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(color: Color(0xFFFFFFFF)),
+        padding: EdgeInsets.all(5),
+        child: Column(
+          children: [
+            Text(title, style: APP_TEXT_STYLE.textPerpal12),
+            SizedBox(height: 5),
+            Text(subTitle, style: APP_TEXT_STYLE.textParpal10),
+          ],
+        ),
+      ),
+    );
+  }
 }
