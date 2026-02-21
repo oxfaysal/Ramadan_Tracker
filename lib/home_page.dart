@@ -3,6 +3,8 @@ import 'package:daily_ramadan_tracker_app/conts/TEXT_STYLE.dart';
 import 'package:daily_ramadan_tracker_app/tasbih_page.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hijri/hijri_calendar.dart';
+import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -84,9 +86,16 @@ Map<String, dynamic> getPrayerTimesData() {
 
 class HomePage extends StatelessWidget {
 
+  final _today = HijriCalendar.now();
+  late final String _dayName =  _today.getDayName();
+  late final String _dateFormat = "${_today.hDay} ${_today.longMonthName} ${_today.hYear}";
+
+  DateTime date = DateTime.now();
+  late String today = DateFormat('d MMMM yyyy').format(date);
+
   final prayerData = getPrayerTimesData();
-  final DateTime now = DateTime.now();
-  late DateTime today = DateTime(now.year, now.month, now.day);
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -128,16 +137,16 @@ class HomePage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Today", style: APP_TEXT_STYLE.textWhite16),
+                  Text(_dayName, style: APP_TEXT_STYLE.textWhite16),
 
                   SizedBox(height: 6),
 
-                  Text("1st Ramadan 4445", style: APP_TEXT_STYLE.textWhite14),
+                  Text(_dateFormat, style: APP_TEXT_STYLE.textWhite14),
 
                   SizedBox(height: 6),
 
                   Text(
-                    today.toString().substring(0, 10),
+                    today,
                     style: APP_TEXT_STYLE.textWhite10,
                   ),
 
@@ -313,7 +322,7 @@ class HomePage extends StatelessWidget {
 
                   Center(
                     child: Text(
-                      "12 Mar 2024",
+                      today,
                       style: APP_TEXT_STYLE.textWhite10,
                     ),
                   ),
