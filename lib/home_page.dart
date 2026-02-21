@@ -1,8 +1,93 @@
+import 'package:adhan_dart/adhan_dart.dart';
 import 'package:daily_ramadan_tracker_app/conts/TEXT_STYLE.dart';
 import 'package:daily_ramadan_tracker_app/tasbih_page.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+
+// Future<Position> _qiblaDirection() async {
+//   bool serviceEnabled;
+//   LocationPermission permission;
+//
+//   serviceEnabled = await Geolocator.isLocationServiceEnabled();
+//   if (!serviceEnabled) {
+//     return Future.error('Location services are disabled.');
+//   }
+//
+//   permission = await Geolocator.checkPermission();
+//   if (permission == LocationPermission.denied) {
+//     permission = await Geolocator.requestPermission();
+//     if (permission == LocationPermission.denied) {
+//       return Future.error('Location permissions are denied');
+//     }
+//   }
+//
+//   if (permission == LocationPermission.deniedForever) {
+//     return Future.error('Location permissions are permanently denied.');
+//   }
+//
+//   return await Geolocator.getCurrentPosition(
+//       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high)
+//   );
+// }
+
+
+Map<String, dynamic> getPrayerTimesData() {
+
+  // Position position = await _qiblaDirection();
+  // final coordinates = Coordinates(position.latitude, position.longitude);
+
+  tz.initializeTimeZones();
+  final location = tz.getLocation('Asia/Dhaka');
+  final now = tz.TZDateTime.now(location);
+
+  Coordinates coordinates = const Coordinates(23.8103, 90.4125);
+
+  CalculationParameters params = CalculationParameters(
+    method: CalculationMethod.muslimWorldLeague,
+    fajrAngle: 18.0,
+    ishaAngle: 17.0,
+  );
+  params.madhab = Madhab.hanafi;
+
+  PrayerTimes prayerTimes = PrayerTimes(
+    coordinates: coordinates,
+    date: now,
+    calculationParameters: params,
+    precision: true,
+  );
+
+  // Formate Time (Google Search)
+  // সময় ফরম্যাট করার ফাংশন (HH:mm AM/PM)
+  String formatTime(DateTime? time) {
+    if (time == null) return "--:--";
+    var localTime = tz.TZDateTime.from(time, location);
+
+    int hour = localTime.hour > 12 ? localTime.hour - 12 : (localTime.hour == 0 ? 12 : localTime.hour);
+    String h = hour.toString().padLeft(2, '0');
+    String m = localTime.minute.toString().padLeft(2, '0');
+    String period = localTime.hour >= 12 ? "PM" : "AM";
+
+    return "$h:$m $period";
+  }
+
+  return {
+    "Fajr": formatTime(prayerTimes.fajr),
+    "Dhuhr": formatTime(prayerTimes.dhuhr),
+    "Asr": formatTime(prayerTimes.asr),
+    "Maghrib": formatTime(prayerTimes.maghrib),
+    "Isha": formatTime(prayerTimes.isha),
+  };
+}
 
 class HomePage extends StatelessWidget {
+
+  final prayerData = getPrayerTimesData();
+  final DateTime now = DateTime.now();
+  late DateTime today = DateTime(now.year, now.month, now.day);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +137,7 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 6),
 
                   Text(
-                    "Tuesday, 12 Mar 2024",
+                    today.toString().substring(0, 10),
                     style: APP_TEXT_STYLE.textWhite10,
                   ),
 
@@ -73,7 +158,7 @@ class HomePage extends StatelessWidget {
                             horizontal: 25,
                           ),
                           child: Text(
-                            "Ifter time-vhg:15 pm",
+                            "Ifter time - ${prayerData['Maghrib']}",
                             style: APP_TEXT_STYLE.textPerpal10,
                           ),
                         ),
@@ -88,7 +173,7 @@ class HomePage extends StatelessWidget {
                             horizontal: 20,
                           ),
                           child: Text(
-                            "Ifter time-vhg:15 pm",
+                            "Sehri time - ${prayerData['Fajr']}",
                             style: APP_TEXT_STYLE.textPerpal10,
                           ),
                         ),
@@ -122,10 +207,20 @@ class HomePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _categoryCard("assets/images/prayer_time.png", "Prayer Time",),
+                    _categoryCard(
+                      "assets/images/prayer_time.png",
+                      "Prayer Time",
+                    ),
                     InkWell(
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TasbihPage())),
-                        child: _categoryCard("assets/images/tasbih.png", "Tasbih",)),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TasbihPage()),
+                      ),
+                      child: _categoryCard(
+                        "assets/images/tasbih.png",
+                        "Tasbih",
+                      ),
+                    ),
                     _categoryCard("assets/images/dua.png", "Dua"),
                     _categoryCard("assets/images/quran.png", "Quran"),
                   ],
@@ -164,13 +259,19 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 10),
 
                   InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TasbihPage())),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TasbihPage()),
+                    ),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 20,
+                      ),
                       child: Text(
                         "Get Started",
                         style: APP_TEXT_STYLE.textPerpal12,
@@ -274,11 +375,11 @@ class HomePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     spacing: 5,
                     children: [
-                      _prayerCard("Fajr", "4:56AM"),
-                      _prayerCard("Dhuhr", "12:09PM"),
-                      _prayerCard("Asr", "4:26PM"),
-                      _prayerCard("Maghrib", "6:06PM"),
-                      _prayerCard("Isha", "7:21PM"),
+                      _prayerCard("Fajr", "${prayerData['Fajr']}"),
+                      _prayerCard("Dhuhr", "${prayerData['Dhuhr']}"),
+                      _prayerCard("Asr", "${prayerData['Asr']}"),
+                      _prayerCard("Maghrib", "${prayerData['Maghrib']}"),
+                      _prayerCard("Isha", "${prayerData['Isha']}"),
                     ],
                   ),
                 ],

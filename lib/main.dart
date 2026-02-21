@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'package:timezone/data/latest.dart' as tz;
 import 'home_page.dart';
 
 void main() {
   runApp(const MyApp());
+
+  tz.initializeTimeZones();
 }
 
 class MyApp extends StatelessWidget {
