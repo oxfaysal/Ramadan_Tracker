@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                 color: Color(0xFFdad3e1),
                 borderRadius: BorderRadius.circular(50),
               ),
-              padding: EdgeInsets.all(6),
+
               child: IconButton(
                 onPressed: () {
                   _getSelectDivision(context);
@@ -167,6 +167,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -514,9 +515,12 @@ class _HomePageState extends State<HomePage> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        title: Text("Hi ! There, Select Division"),
         content: StatefulBuilder(
           builder: (context, setDialogState){
             return DropdownButton(
+                isExpanded: true,
+                hint: Text("Choose Division"),
                 items: location.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
                 value: selectedItem,
                 onChanged: (val){
