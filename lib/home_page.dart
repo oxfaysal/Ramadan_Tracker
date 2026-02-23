@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-
 // Future<Position> _qiblaDirection() async {
 //   bool serviceEnabled;
 //   LocationPermission permission;
@@ -34,10 +33,11 @@ import 'package:timezone/timezone.dart' as tz;
 //       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high)
 //   );
 // }
+List<String> location = ["Dhaka", "Barisal", "Chittagong", "Khulna", "Rajshahi", "Rangpur"];
 
+var selectedItem;
 
 Map<String, dynamic> getPrayerTimesData() {
-
   // Position position = await _qiblaDirection();
   // final coordinates = Coordinates(position.latitude, position.longitude);
 
@@ -45,8 +45,30 @@ Map<String, dynamic> getPrayerTimesData() {
   final location = tz.getLocation('Asia/Dhaka');
   final now = tz.TZDateTime.now(location);
 
-  Coordinates coordinates = const Coordinates(23.8103, 90.4125);
+  double valueLet = 23.8103;
+  double valueLon = 90.4125;
 
+  if(selectedItem.toString() == "Dhaka"){
+    valueLet = 23.8103;
+    valueLon = 90.4125;
+  } else if(selectedItem.toString() == "Barisal"){
+    valueLet = 22.6859;
+    valueLon = 90.3563;
+  } else if(selectedItem.toString() == "Chittagong") {
+    valueLet = 22.3569;
+    valueLon = 91.7832;
+  } else if(selectedItem.toString() == "Khulna") {
+    valueLet = 22.8157;
+    valueLon = 89.5686;
+  } else if (selectedItem.toString() == "Rajshahi") {
+    valueLet = 24.3637;
+    valueLon = 88.6241;
+  } else if (selectedItem.toString() == "Rangpur") {
+    valueLet = 25.7456;
+    valueLon = 89.2187;
+  }
+
+  Coordinates coordinates = Coordinates(valueLet, valueLon);
   CalculationParameters params = CalculationParameters(
     method: CalculationMethod.muslimWorldLeague,
     fajrAngle: 18.0,
@@ -61,13 +83,14 @@ Map<String, dynamic> getPrayerTimesData() {
     precision: true,
   );
 
-  // Formate Time (Google Search)
   // সময় ফরম্যাট করার ফাংশন (HH:mm AM/PM)
   String formatTime(DateTime? time) {
     if (time == null) return "--:--";
     var localTime = tz.TZDateTime.from(time, location);
 
-    int hour = localTime.hour > 12 ? localTime.hour - 12 : (localTime.hour == 0 ? 12 : localTime.hour);
+    int hour = localTime.hour > 12
+        ? localTime.hour - 12
+        : (localTime.hour == 0 ? 12 : localTime.hour);
     String h = hour.toString().padLeft(2, '0');
     String m = localTime.minute.toString().padLeft(2, '0');
     String period = localTime.hour >= 12 ? "PM" : "AM";
@@ -84,21 +107,41 @@ Map<String, dynamic> getPrayerTimesData() {
   };
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
   final _today = HijriCalendar.now();
-  late final String _dayName =  _today.getDayName();
-  late final String _dateFormat = "${_today.hDay} ${_today.longMonthName} ${_today.hYear}";
+
+  late final String _dayName = _today.getDayName();
+
+  late final String _dateFormat =
+      "${_today.hDay} ${_today.longMonthName} ${_today.hYear}";
 
   DateTime date = DateTime.now();
+
   late String today = DateFormat('d MMMM yyyy').format(date);
 
-  final prayerData = getPrayerTimesData();
 
+  Map<String, dynamic> prayerData = {};
 
+  void updatePrayerData() {
+    prayerData = getPrayerTimesData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updatePrayerData();
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    if (prayerData.isEmpty) updatePrayerData();
+
     return Scaffold(
       backgroundColor: Color(0xFFF2F2F2),
       appBar: AppBar(
@@ -113,7 +156,13 @@ class HomePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(50),
               ),
               padding: EdgeInsets.all(6),
-              child: Icon(Icons.notifications_none, color: Colors.black),
+              child: IconButton(
+                onPressed: () {
+                  _getSelectDivision(context);
+                },
+                icon: Icon(Icons.location_pin),
+                color: Colors.black,
+              ),
             ),
           ),
         ],
@@ -145,10 +194,7 @@ class HomePage extends StatelessWidget {
 
                   SizedBox(height: 6),
 
-                  Text(
-                    today,
-                    style: APP_TEXT_STYLE.textWhite10,
-                  ),
+                  Text(today, style: APP_TEXT_STYLE.textWhite10),
 
                   SizedBox(height: 15),
 
@@ -320,12 +366,7 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
 
-                  Center(
-                    child: Text(
-                      today,
-                      style: APP_TEXT_STYLE.textWhite10,
-                    ),
-                  ),
+                  Center(child: Text(today, style: APP_TEXT_STYLE.textWhite10)),
 
                   SizedBox(height: 10),
 
@@ -468,4 +509,33 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  _getSelectDivision(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: StatefulBuilder(
+          builder: (context, setDialogState){
+            return DropdownButton(
+                items: location.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+                value: selectedItem,
+                onChanged: (val){
+                  setDialogState(() {
+                    selectedItem = val;
+                  });
+                  setState(() {
+                    selectedItem = val;
+                    updatePrayerData();
+                  });
+                  Navigator.pop(context);
+                }
+            );
+          }
+        ),
+      ),
+    );
+  }
+
+
+
 }
