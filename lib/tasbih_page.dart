@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:daily_ramadan_tracker_app/conts/TEXT_STYLE.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TasbihPage extends StatefulWidget {
   const TasbihPage({super.key});
@@ -15,10 +16,18 @@ class _HomePageState extends State<TasbihPage> {
   int seconds = 0;
   int counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      counter++;
-    });
+
+  @override
+  void initState() {
+    super.initState();
+    _getCounter();
+  }
+
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
 
@@ -31,6 +40,7 @@ class _HomePageState extends State<TasbihPage> {
 
     return "${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}";
   }
+
 
   void startTimer() {
     if (isRunning) return;
@@ -46,6 +56,7 @@ class _HomePageState extends State<TasbihPage> {
     });
   }
 
+
   void stopTimer() {
     _timer?.cancel();
     setState(() {
@@ -53,10 +64,18 @@ class _HomePageState extends State<TasbihPage> {
     });
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+
+  Future<void> _saveCounter() async {
+    final prefs =  await SharedPreferences.getInstance();
+    await prefs.setInt('counter', counter);
+  }
+
+
+  Future<void> _getCounter() async {
+    final prefs =  await SharedPreferences.getInstance();
+    setState(() {
+      counter = prefs.getInt('counter') ?? 0;
+    });
   }
 
   @override
@@ -137,8 +156,13 @@ class _HomePageState extends State<TasbihPage> {
                     SizedBox(height: 24),
 
                     GestureDetector(
-                      onTap: () {
-                        isRunning ? _incrementCounter() : null;
+                      onTap: () async {
+                        if (isRunning) {
+                          setState(() {
+                            counter++;
+                          });
+                          await _saveCounter();
+                        }
                       },
                       child: AnimatedContainer(
                         width: 120,
@@ -178,11 +202,13 @@ class _HomePageState extends State<TasbihPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _controlButton(Icons.refresh, () {
+                        _controlButton(Icons.refresh, () async {
                           setState(() {
                             counter = 0;
                             seconds = 0;
                           });
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setInt('counter', 0);
                         }),
                         _textButton("Stop", () {
                           stopTimer();
